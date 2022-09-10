@@ -1,0 +1,14 @@
+#root {
+    display: flex;
+    height: 100vh;
+}
+
+.firstDiv {
+    width: 40%;
+    background-color: yellow;
+}
+
+.secondDiv {
+    width: 60%;
+    background-color: lightblue;
+}
