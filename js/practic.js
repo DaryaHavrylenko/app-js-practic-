@@ -39,6 +39,8 @@ const books = [{
   },
 
 ]
+const STORAGE_KEY = "books";
+localStorage.setItem(STORAGE_KEY, JSON.stringify(books));
 
 const rootEl = document.querySelector('#root');
 const firstDiv = document.createElement('div');
@@ -61,6 +63,7 @@ firstDiv.append(headingEl, ulEl, btnEl);
 
 
 function renderList() {
+    const books = JSON.parse(localStorage.getItem(STORAGE_KEY));
   const bookTitle = books.map(({ title, id }) => {
   return `<li id='${id}'><p>${title}</p>
     <button class='edit'>edit</button>
@@ -91,23 +94,39 @@ function renderEdit(event) {
     console.log('edit');
 }
 function renderDelete(event) {
-      const bookId = event.target.parentNode.id
+     const bookId = event.target.parentNode.id;
+    const deleteId = JSON.parse(localStorage.getItem(STORAGE_KEY))
+        .filter((element) => element.id !== bookId);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(deleteId));
+    console.log(deleteId);
+   
     console.log(bookId);
     console.log('delete');
+    ulEl.innerHTML = '';
+    renderList();
+    const divContainer = document.querySelector('.container');
+    if (!divContainer) {
+        return;
+    }
+    if (bookId === divContainer.dataset.id) {
+        secondDiv.innerHTML = "";
+ }
+    renderPreview();
 }
 
 function renderPreview(event) {
+    const books = JSON.parse(localStorage.getItem(STORAGE_KEY));
     const titleTC = event.target.textContent;
     console.log(titleTC);
     
  const titleObj = books.find(options => options.title === titleTC);
     console.log(titleObj);
-    const markUp = createPreviewMarkUp(titleObj);
-    secondDiv.insertAdjacentHTML('beforeend', markUp);
+    
+    secondDiv.innerHTML = createPreviewMarkUp(titleObj);
 }
 
-function createPreviewMarkUp({ title, author, img, plot }) {
- const oneBook = `<div>
+function createPreviewMarkUp({ id, title, author, img, plot }) {
+ const oneBook = `<div class="container" data-id="${id}">
     <h2>${title}</h2>
     <p>${author}</p>
     <img src="${img}" alt="" />
@@ -116,3 +135,39 @@ function createPreviewMarkUp({ title, author, img, plot }) {
       
     return oneBook;
 }
+
+btnEl.addEventListener("click", addBook);
+function addBook() {
+    const newObject = {
+        id: `${Date.now()}`,
+        title: "",
+        author: "",
+        img: "",
+        plot: "",
+    };
+    secondDiv.innerHTML = "";
+    secondDiv.insertAdjacentHTML('beforeend', createFormMarkUp());
+    fillObject(newObject);
+}
+function createFormMarkUp() {
+    const form = `<form action="">
+      <label >Title:<input name="title" type="text" /></label
+      ><label >Author:<input name="author" type="text" />Author</label
+      ><label >Image<input name="img" type="text" />Image</labelname=$
+      ><label >Plot<input name="plot" type="text" />Plot</label>
+      <button type='submit'>Save</button>
+    </form>
+`   
+    return form;  
+}
+
+
+function fillObject(book) {
+    const allInputEl = document.querySelectorAll('input');
+    allInputEl.forEach(input => input.addEventListener('change', onInputChange));
+    function onInputChange() {
+    
+}
+}
+
+
