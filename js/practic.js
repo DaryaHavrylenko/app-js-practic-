@@ -88,11 +88,7 @@ function renderList() {
     })
 }
 renderList();
-function renderEdit(event) {
-    const bookId = event.target.parentNode.id
-    console.log(bookId);
-    console.log('edit');
-}
+
 function renderDelete(event) {
      const bookId = event.target.parentNode.id;
     const deleteId = JSON.parse(localStorage.getItem(STORAGE_KEY))
@@ -137,6 +133,7 @@ function createPreviewMarkUp({ id, title, author, img, plot }) {
 }
 
 btnEl.addEventListener("click", addBook);
+
 function addBook() {
     const newObject = {
         id: `${Date.now()}`,
@@ -146,28 +143,98 @@ function addBook() {
         plot: "",
     };
     secondDiv.innerHTML = "";
-    secondDiv.insertAdjacentHTML('beforeend', createFormMarkUp());
+    secondDiv.insertAdjacentHTML('beforeend', createFormMarkUp(newObject));
+
     fillObject(newObject);
-}
-function createFormMarkUp() {
-    const form = `<form action="">
-      <label >Title:<input name="title" type="text" /></label
-      ><label >Author:<input name="author" type="text" />Author</label
-      ><label >Image<input name="img" type="text" />Image</labelname=$
-      ><label >Plot<input name="plot" type="text" />Plot</label>
+
+    const formEl = document.querySelector('form');
+    formEl.addEventListener('submit', onSubmitForm);
+
+    function onSubmitForm(event) {
+        event.preventDefault();
+
+        const values = Object.values(newObject);
+        const isEmptyString = values.some(elm => elm === '');
+        // console.log(isEmpty)
+        if (isEmptyString) {
+            alert('введите все данные!');
+            return;
+        }
+    
+        // console.log(newObject);
+        const books = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        books.push(newObject);
+
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(books));
+        // console.log(books);
+        ulEl.innerHTML = '';
+        renderList();
+        secondDiv.innerHTML = '';
+        secondDiv.innerHTML = createPreviewMarkUp(newObject);
+    }
+    
+    function createFormMarkUp({ title, author, img, plot }) {
+        const form = `<form action="">
+      <label >Title:<input name="title" type="text" value ="${title}" /></label
+      ><label >Author:<input name="author" type="text" value ="${author}" />Author</label
+      ><label >Image<input name="img" type="text" value ="${img}" />Image</labelname=$
+      ><label >Plot<input name="plot" type="text" value ="${plot}" />Plot</label>
       <button type='submit'>Save</button>
     </form>
-`   
-    return form;  
-}
+`
+        return form;
+    }
 
 
-function fillObject(book) {
-    const allInputEl = document.querySelectorAll('input');
-    allInputEl.forEach(input => input.addEventListener('change', onInputChange));
-    function onInputChange() {
+    function fillObject(book) {
+        const allInputEl = document.querySelectorAll('input');
+        allInputEl.forEach(input => input.addEventListener('change', onInputChange));
+        function onInputChange(event) {
+            book[event.target.name] = event.target.value;
+        }
     
+    }
 }
+
+function renderEdit(event) {
+    const bookId = event.target.parentNode.id;
+    console.log(bookId);
+    console.log('edit');
+
+    const books = JSON.parse(localStorage.getItem(STORAGE_KEY));
+   
+    const idObj = books.find(options => options.id === bookId);
+    console.log(idObj);
+    
+    secondDiv.innerHTML = createFormMarkUp(idObj);
+
+fillObject(idObj);
+    
+ const formEl = document.querySelector('form');
+    formEl.addEventListener('submit', onEditForm);
+
+    function onEditForm(event) {
+    event.preventDefault()
+
+const values = Object.values(idObj);
+        const isEmptyString = values.some(elm => elm === '');
+       if (isEmptyString) {
+            alert('введите все данные!');
+            return;
+        }
+        
+        // console.log(newObject);
+        const books = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        const bookIndex = books.findIndex(option => option.id === bookId);
+        books.splice(bookIndex, 1, idObj);
+
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(books));
+        // console.log(books);
+        ulEl.innerHTML = '';
+        renderList();
+        secondDiv.innerHTML = '';
+        secondDiv.innerHTML = createPreviewMarkUp(idObj);
+  }
 }
 
 
